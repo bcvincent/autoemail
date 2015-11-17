@@ -29,13 +29,3 @@
 defined('MOODLE_INTERNAL') || die();
 
 
-function ketautoemail_hidden_field($form=null,$name,$data) {
-	$out='<input type="hidden" name="'.htmlentities("".$name).'" value="'.htmlentities("".$data).'">';
-	if ($form!==null) {
-		$form->addElement('html',$out);
-	} else {
-		return $out;
-	}
-}
-
-

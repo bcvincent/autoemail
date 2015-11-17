@@ -31,6 +31,11 @@ require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/lib.php');
 require_once(dirname(__FILE__).'/locallib.php');
 
+require_login();
+if ( (!has_capability('local/autoemail:manage', context_system::instance())) && (!has_capability('local/autoemail:manageall', context_system::instance())) ) {
+ 	require_capability('local/autoemail:manage', context_system::instance());
+}
+
 ### start processing the page/requests ###
 $id = optional_param('id', 0, PARAM_INT); // id of the email
 $delete = optional_param('delete', 0, PARAM_INT); // id of the email to delete
@@ -51,6 +56,7 @@ if(isset($_POST['id'])){
             $newemail = new stdClass();
             //$newemail->id = $_POST["id"];
             $newemail->emailtime = $_POST["time"];
+            $newemail->emailtype = $_POST["etype"];    
             $newemail->admin = $USER->id;
             $newemail->active = $_POST["active"];
             $newemail->subject = $_POST["subject"];
@@ -68,11 +74,13 @@ if(isset($_POST['id'])){
             $update_values = new stdClass();
             $update_values->id = $post_email->id;
             $update_values->emailtime = $_POST["time"];
+            $update_values->emailtype = $_POST["etype"];
             $update_values->active = $_POST["active"];
             $update_values->subject = $_POST["subject"];
             $update_values->body = $_POST["body"];
             $update_values->timemodified = strtotime(date('Y-m-d H:i:s'));
-            
+                          var_dump($_POST);
+var_dump($update_values);
             if(!$DB->update_record('ketautoemail',$update_values)) {
                 die("Couldn't update purchase record.\nFile: ".__FILE__."\nLine: ".__LINE__."\n");
             }
@@ -90,8 +98,8 @@ if(isset($_POST['id'])){
             break;
       }
 
-    $redirect_url = new moodle_url("/local/autoemail/index.php");
-    redirect($redirect_url);
+   $redirect_url = new moodle_url("/local/autoemail/index.php");
+  redirect($redirect_url);
 }
 
 else{
@@ -120,10 +128,10 @@ if ($id) {
 
 else {
     $emails = new stdClass();
-  //  $emails = $DB->get_record('ketlicense',array('id' => $lic),'*',MUST_EXIST);
     $eid = "new";
     $emails->active = 0;
     $emails->emailtime = null;
+    $emails->emailtype = null;
     $emails->subject = null;
     $emails->body = null;
     $pagetitle="Create Email";
@@ -170,7 +178,7 @@ if(!($id) && ($delete)){ //delete email.  only works if only delete param is pre
 
     $delete_output .= "<table class='license-table'>";
     $delete_output .= "<tr>\n";
-    $delete_output .= "<th style='text-align:left; padding-right:.5em;'>Time to Expiration</th>\n";
+    $delete_output .= "<th style='text-align:left; padding-right:.5em;'>Time</th>\n";
     $delete_output .= "<th style='text-align:left'>Subject</th>\n";
     $delete_output .= "<th style='text-align:left'>Admin</th>\n";
 
@@ -243,9 +251,22 @@ else {  //create or edit an email
 
     // time
     $form_fields .= html_writer::start_tag('p');
-    $form_fields .= html_writer::tag('label', 'Days before expiration to email', array( 'for' => 'time', 'class' => 'ae_reports_label' ));
+    $form_fields .= html_writer::tag('label', 'Days', array( 'for' => 'time', 'class' => 'ae_reports_label' ));
     $form_fields .= html_writer::empty_tag('input', array('type' => 'number', 'name' => 'time', 'id' => 'fiscalyear', 'class' => 'ae_reports_input', 'value' => $emails->emailtime));
     $form_fields .= html_writer::end_tag('p');
+    
+    $type_options = array();
+    $type_options['expiring'] = 'Until expiration';
+    $type_options['enrolling'] = 'Since enrolling';
+    
+    $form_fields .= html_writer::start_tag('p');
+    $form_fields .= html_writer::tag('label', 'Type', array( 'for' => 'etype', 'class' => 'ae_reports_label' ));
+    $dropdown_output = html_writer::select($type_options, 'etype', $emails->emailtype, 'Select Below');
+    $form_fields .= $dropdown_output;
+
+    //$form_fields .= html_writer::empty_tag('input', array('type' => 'number', 'name' => 'etype', 'id' => 'fiscalyear', 'class' => 'ae_reports_input', 'value' => $emails->emailtype));
+    $form_fields .= html_writer::end_tag('p');
+    
 
     $form_fields .= html_writer::end_tag('p');
 

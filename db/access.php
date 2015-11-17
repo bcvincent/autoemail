@@ -49,42 +49,12 @@ defined('MOODLE_INTERNAL') || die();
 
 $capabilities = array(
 
-	'local/autoemail:manage' => array(
-			'riskbitmask' => RISK_XSS,
-			'captype' => 'write',
-			'contextlevel' => CONTEXT_SYSTEM,
-			'archetypes' => array(
-					'admin' => CAP_ALLOW
-			)
-	),
 	'local/autoemail:manageall' => array(
 			'riskbitmask' => RISK_XSS,
 			'captype' => 'write',
 			'contextlevel' => CONTEXT_SYSTEM,
 			'archetypes' => array(
 					'admin' => CAP_ALLOW
-			)
-	),
-	'local/autoemail:config' => array(
-			'riskbitmask' => RISK_XSS,
-			'captype' => 'write',
-			'contextlevel' => CONTEXT_SYSTEM,
-			'archetypes' => array(
-					'admin' => CAP_ALLOW
-			)
-	),
-	'local/autoemail:active' => array(
-			'riskbitmask' => RISK_XSS,
-			'captype' => 'write',
-			'contextlevel' => CONTEXT_COURSE,
-			'archetypes' => array(
-			)
-	),
-	'local/autoemail:expired' => array(
-			'riskbitmask' => RISK_XSS,
-			'captype' => 'write',
-			'contextlevel' => CONTEXT_COURSE,
-			'archetypes' => array(
 			)
 	)
 );
